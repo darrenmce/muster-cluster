@@ -1,0 +1,66 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: mustard
+  name: mustard 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mustard
+  template:
+    metadata:
+      labels:
+        app: mustard
+    spec:
+      containers:
+      - image: darrenmce/mustard
+        imagePullPolicy: Always
+        name: mustard-jar
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: mustard-svc
+  labels:
+    app: mustard
+spec:
+  selector:
+    app: mustard
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mustard-ing
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: nginx
+  labels:
+    app: mustard
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /mustard
+        backend:
+          serviceName: mustard-svc
+          servicePort: 80
+
