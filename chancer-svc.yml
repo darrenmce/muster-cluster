@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: chancer-svc
+  labels:
+    app: chancer
+spec:
+  selector:
+    app: chancer 
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  sessionAffinity: None
+  type: ClusterIP 
